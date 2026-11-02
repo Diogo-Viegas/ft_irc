@@ -1,6 +1,9 @@
 #include "../inc/Server.hpp"
-
+#include <bits/stdc++.h>
+#include <arpa/inet.h>
 bool Server::signal = false;
+
+
 
 void Server::clearClients(int fd){ //-> clear the clients
 	for(size_t i = 0; i < fds.size(); i++){ //-> remove the client from the pollfd
@@ -31,6 +34,58 @@ void Server::closeFds(){
 		close(serverSocketFD);
 	}
 }
+void Server::receiveNewData(int fd)
+{
+	char buff[1024]; //-> buffer for the received data
+	memset(buff, 0, sizeof(buff)); //-> clear the buffer
+
+	ssize_t bytes = recv(fd, buff, sizeof(buff) - 1 , 0); //-> receive the data
+
+	if(bytes <= 0){ //-> check if the client disconnected
+		std::cout << "Client <" << fd << "> Disconnected" << std::endl;
+		clearClients(fd); //-> clear the client
+		close(fd); //-> close the client socket
+	}
+
+	else{ //-> print the received data
+		buff[bytes] = '\0';
+		std::cout << "Client <" << fd << "> Data: " << buff;
+		//here you can add your code to process the received data: parse, check, authenticate, handle the command, etc...
+	}
+}
+
+void Server::acceptNewClient()
+{
+	Client cli;
+	struct sockaddr_in cliadd;
+	struct pollfd newPoll;
+	socklen_t len = sizeof(cliadd);
+
+	int incofd = accept(serverSocketFD,(sockaddr *)&(cliadd),&len); //accept the new client
+	if(incofd == -1)
+	{
+		std::cout << "accept() failed" << std::endl;
+		return;
+	}
+	if(fcntl(incofd,F_SETFL,O_NONBLOCK) == -1)
+	{
+		std::cout << "fcntl() failed" << std::endl;
+		return;
+	}
+	newPoll.fd = incofd;
+	newPoll.events = POLLIN;
+	newPoll.revents = 0;
+
+	cli.setFd(incofd);
+	cli.setIPaddr(inet_ntoa((cliadd.sin_addr)));
+	clients.push_back(cli);
+	fds.push_back(newPoll);
+
+	std::cout << "Client <" << incofd << "> Connected" << std::endl;
+
+}	
+
+
 
 
 void Server::serverSocket()
