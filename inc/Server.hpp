@@ -1,45 +1,35 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
+#include "Client.hpp"
 #include <iostream>
 #include <vector>
+#include <map>
 #include <poll.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <fcntl.h>
 #include <signal.h>
-class Client
-{
-    private:
-        int Fd;
-        std::string IPaddr;
-    public:
-        Client(){};
-        int getFd(){return Fd;}
-        void setFd(int fd){Fd = fd;}
-        void setIPaddr(std::string ipaddr){IPaddr = ipaddr;}
-};
+
 
 class Server
 {
     private:
-        int port;
-        int serverSocketFD;
-        static bool signal;
-        std::vector <Client> clients;
-        std::vector <struct pollfd> fds;
-    public:
-        Server(){serverSocketFD = -1;}
+        int _port;
+        int _serverFd;
+        std::string _password;
+        std::vector <struct pollfd> _pollFds;
+        std::map<int,Client> _clients;
 
-        void serverInit();
-        void serverSocket();
+        void initServer();
         void acceptNewClient();
-        void receiveNewData(int fd);
+        void handleClientData(int clientFd);
+        void removeClient(int clientFd);
+    public:
+        Server(int port, const std::string &password);
+        ~Server();
 
-        static void signalHandler(int signum);
-
-        void closeFds();
-        void clearClients(int fd);
+        void run();
 };
 
 

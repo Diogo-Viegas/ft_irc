@@ -1,23 +1,16 @@
 
 NAME = ircserv
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -Iinc
 
-SRCS = src/Server.cpp
-	
-
-
+SRCS = src/Server.cpp src/Client.cpp src/main.cpp
 OBJS = $(SRCS:.cpp=.o)
+
 all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
-
-
-
-%.o: %.cpp inc/Server.hpp
-	$(CC) $(CFLAGS) -c $< -o $@
-
+	
 clean:
 	@rm -f $(OBJS)
 
