@@ -1,4 +1,5 @@
 #include "../inc/Server.hpp"
+#include "../inc/Parser.hpp"
 #include <cerrno>
 #include <cstring>
 Server::Server(int port,const std::string &password):_serverFd(-1),_port(port),_password(password)
@@ -101,14 +102,28 @@ void Server::handleClientData(int clientFd)
 	Client &client = _clients[clientFd];
 	client.appendReadBuffer(buffer);
 
-	std::string command;
-	while(client.extractCommand(command))
-	{
-		std::cout << "[FD " << clientFd << "] Received command " << command << std::endl;
-		//parsing and execution goes here
 
+	std::string rawLine;
+	while (client.extractCommand(rawLine)) {
+		if (rawLine.empty())
+			continue;
+
+		IRCmsg msg = Parser::parseLine(rawLine);
+		if (msg.command.empty())
+			continue;
+
+		// Debug visual para validares o parsing:
+		std::cout << "[CMD] " << msg.command << " | Args (" << msg.args.size() << "): ";
+		for (size_t i = 0; i < msg.args.size(); ++i) {
+			std::cout << "[" << msg.args[i] << "] ";
+		}
+		std::cout << std::endl;
+
+    // Próximo passo: encaminhar para execução
+    // executeCommand(client, msg);
 	}
 }
+
 // Step 3 -> Remove and Clean Client
 
 void Server::removeClient(int clientFd)
