@@ -11,7 +11,12 @@
 #include <fcntl.h>
 #include <signal.h>
 
-
+enum irc_err
+{
+	ERR_NEEDMOREPARAMS = 461,
+	ERR_ALREADYREGISTRED = 462,
+};
+struct IRCmsg;
 class Server
 {
     private:
@@ -25,6 +30,11 @@ class Server
         void acceptNewClient();
         void handleClientData(int clientFd);
         void removeClient(int clientFd);
+		void pass_cmd(Client &client, const std::vector<std::string> &args);
+		int nickCommand(Client &client, const std::vector<std::string> &args);
+		int userCommand(Client &client,const std::vector<std::string> &args);
+		void executeCommand(Client &client, const IRCmsg &msg);
+		bool nickinUse(const std::string &nickname);
     public:
         Server(int port, const std::string &password);
         ~Server();

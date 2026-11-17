@@ -65,6 +65,20 @@ void Server::initServer()
 }
 
 
+void Server::executeCommand(Client &client, const IRCmsg &msg)
+{
+	if (msg.command == "PASS")
+		pass_cmd(client, msg.args);
+
+	else if (msg.command == "NICK")
+		nickCommand(client, msg.args);
+
+	else if (msg.command == "USER")
+		userCommand(client, msg.args);
+
+	else
+		std::cout << "[SERVER] Unknown command: " << msg.command << std::endl;
+}
 
 //Accept new connection
 void Server::acceptNewClient()
@@ -119,8 +133,8 @@ void Server::handleClientData(int clientFd)
 		}
 		std::cout << std::endl;
 
-    // Próximo passo: encaminhar para execução
-    // executeCommand(client, msg);
+	// Próximo passo: encaminhar para execução
+	executeCommand(client, msg);
 	}
 }
 
