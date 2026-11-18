@@ -1,5 +1,6 @@
 #include "../inc/Server.hpp"
 #include "../inc/Parser.hpp"
+#include "../inc/Replies.hpp"
 #include <cerrno>
 #include <cstring>
 Server::Server(int port,const std::string &password):_serverFd(-1),_port(port),_password(password)

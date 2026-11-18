@@ -1,4 +1,5 @@
 #include "../../inc/Server.hpp"
+#include "../../inc/Replies.hpp"
 #include "../../inc/Client.hpp"
 
 void Server::pass_cmd(Client &client, const std::vector<std::string> &args)
@@ -71,7 +72,7 @@ int Server::userCommand(Client &client,const std::vector<std::string> &args)
 		return(ERR_NEEDMOREPARAMS);
 
 	if (client.isRegistered())
-		return(ERR_ALREADYREGISTRED);
+		return(ERR_ALREADYREGISTERED);
 
 	client.setUsername(args[0]);
 	client.setRealname(args[3]);
